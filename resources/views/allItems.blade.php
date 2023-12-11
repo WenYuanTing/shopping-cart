@@ -23,6 +23,8 @@
                     <p>商品描述 : {{ $item->description }}</p>
                     <h3>商品價格 : {{ $item->price }}</h3>
                     <h3>目前庫存 : {{ $item->quantity }}</h3>
+                    <a
+                        href="{{ route('items.edit', ['id' => $item->id]) }}">更新資訊</a>
                     @if($item->is_active)
                         <button onclick="activateItem({{ $item->id }})">下架商品</button>
                     @else
