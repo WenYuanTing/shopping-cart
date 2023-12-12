@@ -4,6 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <title>購物車</title>
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -22,7 +24,11 @@
                     <p>商品描述 : {{ $item->description }}</p>
                     <h3>商品價格 : {{ $item->price }}</h3>
                     <h3>目前庫存 : {{ $item->quantity }}</h3>
-                    <button>加入購物車</button>
+                    @auth
+                        <a href="{{ route('itemAddToCart', $item->id) }}">加入購物車</a>
+                    @else
+                        <a href="{{ route('login') }}">登入以加入購物車</a>
+                    @endauth
                 </div>
 
             @endif
@@ -32,7 +38,6 @@
         @endforelse
 
     </div>
-
 </body>
 
 </html>

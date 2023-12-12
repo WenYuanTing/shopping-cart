@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
-
+use App\Http\Controllers\ItemController;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Providers\RouteServiceProvider;
@@ -34,6 +34,8 @@ class AuthenticatedSessionController extends Controller
 
         $request->session()->regenerate();
 
+        ItemController::getTotalQuantity();
+
         return redirect()->route('items.index');
     }
 
@@ -51,4 +53,6 @@ class AuthenticatedSessionController extends Controller
 
         //return redirect('/');
     }
+
+    
 }

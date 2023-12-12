@@ -1,10 +1,14 @@
 <?php
 use App\Models\Item;
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\ItemController;
+
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
+use App\Models\UsersShoppingCart;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -117,3 +121,88 @@ Route::middleware('auth')->group(function () {
 });
 
 require __DIR__.'/auth.php';
+
+
+
+Route::get('/shoppingCart/{id}', function ($id) {
+    $userShoppingCartItems = UsersShoppingCart::where('user_id', $id)->latest()->get();
+
+    
+    return view('shoppingCart',compact('userShoppingCartItems'));
+})->name('userShoppingCartItems');
+
+Route::get('/itemAddToCart/{id}', [ItemController::class, 'addItemToCart'])->name('itemAddToCart');
+
+// Route::put('/item/increaseQuantity/{itemId}', function($itemId, Request $request){
+//     $quantity = $request->query('quantity');
+//     $userId = $request->query('user_id');
+// dd($userId);
+//     $item=UsersShoppingCart::findorFail($userId);
+//     dd($item);
+//     //$item->quantity=$data['quantity'];
+//     $item->save();
+
+
+//     return redirect()->route('items.index');
+
+// })->name('item.increaseQuantity');
+
+
+Route::put('/item/increaseQuantity/{itemId}', function($itemId, Request $request){
+    try {
+        $data = $request->validate([
+            'quantity' => 'required|integer|min:1',
+            'user_id' => 'required|integer', // 添加用户ID的验证规则
+        ]);
+
+        $userId = $data['user_id'];
+
+        // 根据 user_id 和 item_id 找到购物车项
+        $item = UsersShoppingCart::where('user_id', $userId)
+            ->where('product_id', $itemId)
+            ->firstOrFail();
+        $itemStockQuantity = Item::where('id', $itemId)->value('quantity');
+        if( $item->quantity < $itemStockQuantity ){
+            // 更新数量
+            $item->quantity++;
+            $item->save();
+        }
+       
+        ItemController::getTotalQuantity();
+
+        return response()->json(['message' => 'Quantity increased successfully']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+})->name('item.increaseQuantity');
+
+
+Route::put('/item/decreaseQuantity/{itemId}', function($itemId, Request $request){
+    try {
+        $data = $request->validate([
+            'quantity' => 'required|integer|min:1',
+            'user_id' => 'required|integer', // 添加用户ID的验证规则
+        ]);
+
+        $userId = $data['user_id'];
+
+        // 根据 user_id 和 item_id 找到购物车项
+        $item = UsersShoppingCart::where('user_id', $userId)
+            ->where('product_id', $itemId)
+            ->firstOrFail();
+
+        // 更新数量
+        $item->quantity--;
+        if($item->quantity==0){
+            $item->delete();
+        }else{
+            $item->save();
+
+        }
+        ItemController::getTotalQuantity();
+
+        return response()->json(['message' => 'Quantity decreased successfully']);
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+})->name('item.decreaseQuantity');

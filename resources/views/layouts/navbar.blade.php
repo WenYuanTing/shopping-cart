@@ -15,7 +15,10 @@
                 <a class="text-white" href="{{ route('items.all') }}">所有商品</a>
 
             @else
-                <a class="text-white" href="">購物車</a>
+                <a class="text-white"
+                    href="{{ route('userShoppingCartItems', ['id' => auth()->user()->id]) }}">購物車
+                    <span>{{ session('cartQuantity') }} </span></a>
+
             @endif
         @endauth
         @auth
@@ -26,6 +29,7 @@
             <a class="text-white" href="{{ route('register') }}">註冊帳號</a>
         @endauth
     </div>
+
 </nav>
 <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
     @csrf
