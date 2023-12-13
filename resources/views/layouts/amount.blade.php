@@ -23,7 +23,8 @@
             <h2 class="text-4xl font-bold mb-8">總金額 : {{ $totalAmount +80 - $discount }}</h2>
         </div>
         <div class="flex justify-center">
-            <a class="text-4xl font-bold" href="">結帳</a>
+            <a class="text-4xl font-bold" href="{{ route('createEcpayOrder') }}">結帳</a>
+
         </div>
     </div>
 </div>

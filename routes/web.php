@@ -2,6 +2,8 @@
 use App\Models\Item;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ItemController;
+use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\OrdersController;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -226,3 +228,5 @@ Route::put('/item/decreaseQuantity/{itemId}', function($itemId, Request $request
         return response()->json(['error' => $e->getMessage()], 500);
     }
 })->name('item.decreaseQuantity');
+
+Route::get('/checkout', [OrdersController::class, 'createEcpayOrder'])->name('createEcpayOrder');
