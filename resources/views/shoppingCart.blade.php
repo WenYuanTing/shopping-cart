@@ -15,6 +15,9 @@
         <h1 class="flex justify-center mt-10 text-5xl	">購物車</h1>
     </div>
     <div class="flex flex-wrap">
+        @php
+            $totalAmount = 0;
+        @endphp
         @forelse($userShoppingCartItems as $userShoppingCartItem)
             <div class="w-1/4 p-20">
                 <h2>商品名稱 : {{ $userShoppingCartItem->name }}</h2>
@@ -31,12 +34,15 @@
                 <h3>價格 :
                     {{ $userShoppingCartItem->price * $userShoppingCartItem->quantity }}
                 </h3>
+                @php
+                    $totalAmount+=$userShoppingCartItem->price * $userShoppingCartItem->quantity
+                @endphp
             </div>
         @empty
             <div>暫無商品</div>
         @endforelse
     </div>
-
+    @include('layouts.amount')
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             var increaseButtons = document.querySelectorAll('.increase-quantity-btn');
