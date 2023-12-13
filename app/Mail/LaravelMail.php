@@ -29,7 +29,7 @@ class LaravelMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Laravel Mail',
+            subject: 'WenYT電商平台',
         );
     }
 

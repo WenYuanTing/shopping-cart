@@ -44,7 +44,12 @@
                 <label for="launch">上架商品 : </label>
                 <input type="checkbox" name="is_active" id="launch" checked>
             </div>
+            <div>
+                <label for="new_item_push_notification">推播通知：</label>
+                <input type="checkbox" name="new_item_push_notification" id="new_item_push_notification" value="1"
+                    {{ request()->input('new_item_push_notification') ? 'checked' : '' }}>
 
+            </div>
             <div class="flex justify-center items-center mt-5">
                 <button type="submit" class="border-double border-4 "> 新增商品 </button>
             </div>

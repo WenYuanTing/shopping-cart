@@ -25,7 +25,12 @@
                     <h3>商品價格 : {{ $item->price }}</h3>
                     <h3>目前庫存 : {{ $item->quantity }}</h3>
                     @auth
-                        <a href="{{ route('itemAddToCart', $item->id) }}">加入購物車</a>
+                        @if(auth()->user()->name!="溫沅庭"){
+                            <a href="{{ route('itemAddToCart', $item->id) }}">加入購物車</a>
+
+                            }
+                        @endif
+
                     @else
                         <a href="{{ route('login') }}">登入以加入購物車</a>
                     @endauth

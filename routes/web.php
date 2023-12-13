@@ -51,7 +51,9 @@ Route::post('/items',function(Request $request){
         'description'=> 'required|max:255',
         'price'=> 'required|max:99999' ,
         'quantity'=> 'required',
+
     ]);
+
     $data['is_active'] = $request->has('is_active');
     $item=new Item;
     $item->name=$data['name'];
@@ -60,9 +62,15 @@ Route::post('/items',function(Request $request){
     $item->quantity=$data['quantity'];
     $item->is_active = $data['is_active'];
     $item->save();
+    $newItemPushNotification = $request->has('new_item_push_notification');
 
-    //$item=Item::create($request->validate());
-
+    if ($newItemPushNotification) {
+        $users = User::all();
+        foreach ($users as $user) {
+            // 使用 Laravel 郵件發送郵件給每個用戶
+            Mail::to($user->email)->send((new LaravelMail($item))->setCustomView('newItems'));
+        }
+    }
     return redirect()->route('items.index');
 
 })->name('items.store');
@@ -103,7 +111,7 @@ Route::put('/items/{id}',function($id, Request $request){
         }
     }
 
-    return redirect()->route('items.index');
+    return redirect()->route('items.all');
 
 })->name('items.update');
 
