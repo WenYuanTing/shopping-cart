@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Illuminate\Http\Request;
 use App\Models\UsersShoppingCart;
+use App\Models\User;
+
+use App\Mail\LaravelMail;
 
 
 /*
@@ -70,21 +73,42 @@ Route::put('/items/{id}',function($id, Request $request){
         'description'=> 'required|max:255',
         'price'=> 'required|max:99999' ,
         'quantity'=> 'required',
+        'push_notification' => 'nullable|boolean',
+        'original_price' => 'required|numeric',
     ]);
-    //$data['is_active'] = $request->has('is_active');
     $item=Item::findorFail($id);
     $item->name=$data['name'];
     $item->description=$data['description'];
     $item->price=$data['price'];
     $item->quantity=$data['quantity'];
-    //$item->is_active = $data['is_active'];
     $item->save();
 
-    //$item=Item::create($request->validate());
+    UsersShoppingCart::where('product_id', $item->id)
+    ->update(['price' => $data['price']]);
+
+    $item->push_notification = $data['push_notification'] ?? false;
+    if ($item->push_notification) {
+        $users = User::all();
+        foreach ($users as $user) {
+            // 使用 Laravel 郵件發送郵件給每個用戶
+            Mail::to($user->email)->send(new LaravelMail($item));
+        }
+    }
+
+    if($data['original_price']>=$data['price']){
+        $usersWithItemInCart = UsersShoppingCart::where('product_id', $item->id)->pluck('user_id');
+        $userEmails = User::whereIn('id', $usersWithItemInCart)->pluck('email');
+        foreach ($userEmails as $email) {
+            Mail::to($email)->send((new LaravelMail($item))->setCustomView('SpecialPrice'));
+        }
+    }
 
     return redirect()->route('items.index');
 
 })->name('items.update');
+
+
+
 
 Route::post('/items/{itemId}/activate', function ($itemId) {
     // 根據 $itemId 從資料庫中找到對應的商品
@@ -133,19 +157,7 @@ Route::get('/shoppingCart/{id}', function ($id) {
 
 Route::get('/itemAddToCart/{id}', [ItemController::class, 'addItemToCart'])->name('itemAddToCart');
 
-// Route::put('/item/increaseQuantity/{itemId}', function($itemId, Request $request){
-//     $quantity = $request->query('quantity');
-//     $userId = $request->query('user_id');
-// dd($userId);
-//     $item=UsersShoppingCart::findorFail($userId);
-//     dd($item);
-//     //$item->quantity=$data['quantity'];
-//     $item->save();
 
-
-//     return redirect()->route('items.index');
-
-// })->name('item.increaseQuantity');
 
 
 Route::put('/item/increaseQuantity/{itemId}', function($itemId, Request $request){

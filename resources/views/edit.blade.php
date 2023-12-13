@@ -44,10 +44,21 @@
                     class="shadow-sm appearance-none border w-full py-2 px-3 text-slate-700 leading-tight focus:outline-none">
             </div>
 
+            <div>
+                <label for="push_notification">推播通知：</label>
+                <input type="checkbox" name="push_notification" id="push_notification" value="1"
+                    {{ $item->push_notification ? 'checked' : '' }}>
+            </div>
+            <!-- 隱藏的表單欄位，用來記錄價格 -->
+            <input type="hidden" name="original_price" value="{{ $item->price }}">
+
 
             <div class="flex justify-center items-center mt-5">
                 <button type="submit" class="border-double border-4 "> 更新商品 </button>
             </div>
+            <!-- <div class="flex justify-center items-center mt-5">
+                <button type="submit" value="updateAndPush" class="border-double border-4 "> 推播並更新商品 </button>
+            </div> -->
 
         </form>
     </div>
