@@ -21,6 +21,9 @@
 
         <div class="flex">
             <h2 class="text-4xl font-bold mb-8">總金額 : {{ $totalAmount +80 - $discount }}</h2>
+            @php
+                session(['amount' => $totalAmount +80 - $discount ]);
+            @endphp
         </div>
         <div class="flex justify-center">
             <a class="text-4xl font-bold" href="{{ route('createEcpayOrder') }}">結帳</a>

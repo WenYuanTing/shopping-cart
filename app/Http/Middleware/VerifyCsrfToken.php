@@ -12,6 +12,8 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
+        //為了POSTMAN測試 暫停csrf
+        '/ecpay/callback',
+        '/'
     ];
 }

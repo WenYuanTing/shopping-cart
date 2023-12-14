@@ -230,3 +230,5 @@ Route::put('/item/decreaseQuantity/{itemId}', function($itemId, Request $request
 })->name('item.decreaseQuantity');
 
 Route::get('/checkout', [OrdersController::class, 'createEcpayOrder'])->name('createEcpayOrder');
+
+Route::post('/ecpay/callback', [OrdersController::class, 'ecpayCallback'])->name('ecpayCallback');
