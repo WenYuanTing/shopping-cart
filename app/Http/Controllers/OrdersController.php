@@ -179,6 +179,47 @@ Mail::to($userEmail)->send($mail->setCustomView('receipt')->with('commonFields',
 
         return response('1|OK');
     }
+    public function handleReceiptSearch(Request $request){
+        $dataToPass = [
+            'invoiceNumber' => $request->input('invoiceNumber'),
+            'invoiceDate' => $request->input('invoiceDate'),
+        ];
+        //dd($dataToPass);
+
+
+        $factory = new Factory([
+            'hashKey' => 'ejCk326UnaZWKisg',
+            'hashIv' => 'q9jcZX8Ib9LM8wYk',
+        ]);
+        $postService = $factory->create('PostWithAesJsonResponseService');
+        
+        $data = [
+            'MerchantID' => '2000132',
+            'InvoiceNo' => $request->input('invoiceNumber'),
+            'InvoiceDate' => $request->input('invoiceDate'),
+        ];
+        $input = [
+            'MerchantID' => '2000132',
+            'RqHeader' => [
+                'Timestamp' => time(),
+                'Revision' => '3.0.0',
+            ],
+            'Data' => $data,
+        ];
+        $url = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/GetIssue';
+        
+        $response = $postService->post($input, $url);
+        $items = $response['Data']['Items'][0];
+
+        $itemName = $items['ItemName'];
+        $itemCount = $items['ItemCount'];
+        $itemWord = $items['ItemWord'];
+        $itemPrice = $items['ItemPrice'];
+        $itemData=[$itemName, $itemCount, $itemWord, $itemPrice];
+
+        return view('receiptDetail',['itemData'=>$itemData]);
+
+    }
 }
 
 

@@ -21,6 +21,14 @@
                 <a class="text-white"
                     href="{{ route('orderList', ['id' => auth()->user()->id]) }}) }}">
                     訂單</a>
+                <form method="POST" action="{{ route('receiptSearch') }}">
+                    @csrf
+                    <label class="text-white" for="">發票號碼 : </label>
+                    <input type="text" name="invoiceNumber" required>
+                    <label class="text-white" for="">發票日期 : </label>
+                    <input type="text" name="invoiceDate" required placeholder="yyyy-mm-dd">
+                    <button class="text-white" type="submit">查詢發票</button>
+                </form>
             @endif
         @endauth
         @auth

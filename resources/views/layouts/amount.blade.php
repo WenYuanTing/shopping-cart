@@ -29,7 +29,6 @@
         </div>
         <form method="POST" action="{{ route('storeFormData') }}">
             @csrf
-
             <div>
                 <label class="text-2xl font-bold mb-2 mr-8">收件名稱 : </label>
                 <input type="text" name="recipient" required class="border-solid border-2 border-black ml-auto ">

@@ -271,3 +271,22 @@ Route::get('/totalOrder', function () {
     // 將資料傳遞給視圖或進行其他操作
     return view('totalOrder', ['paidDatas' => $paidDatas]);
 })->name('totalOrder');
+
+
+Route::post('/receiptSearch', function (Request $request) {
+    // 假設您有一些要保存的數據
+    $dataToPass = [
+        'invoiceNumber' => $request->input('invoiceNumber'),
+        'invoiceDate' => $request->input('invoiceDate'),
+    ];
+    //dd($dataToPass);
+    $request->session()->put('receiptSearchData', $dataToPass);
+
+    // 進行重定向
+    return app(OrdersController::class)->handleReceiptSearch($request);
+})->name('receiptSearch');
+
+// Route::get('/receiptSearch', function (Request $request) {
+//     //dd("進入到GET receiptSearch");
+//     return redirect()->route('handleReceiptSearch');
+// })->name('handlereceiptSearch');
