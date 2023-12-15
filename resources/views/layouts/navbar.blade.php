@@ -11,14 +11,16 @@
         @auth
             @if(auth()->user()->name==="溫沅庭")
                 <a class="text-white" href="{{ route('items.create') }}">新增商品</a>
-                <a class="text-white" href="">總訂單</a>
+                <a class="text-white" href="{{ route('totalOrder') }}">總訂單</a>
                 <a class="text-white" href="{{ route('items.all') }}">所有商品</a>
 
             @else
                 <a class="text-white"
                     href="{{ route('userShoppingCartItems', ['id' => auth()->user()->id]) }}">購物車
                     <span>{{ session('cartQuantity') }} </span></a>
-
+                <a class="text-white"
+                    href="{{ route('orderList', ['id' => auth()->user()->id]) }}) }}">
+                    訂單</a>
             @endif
         @endauth
         @auth

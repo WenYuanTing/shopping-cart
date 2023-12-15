@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ItemController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\OrdersController;
+use App\Models\Paid;
 
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
@@ -232,3 +233,47 @@ Route::put('/item/decreaseQuantity/{itemId}', function($itemId, Request $request
 Route::get('/checkout', [OrdersController::class, 'createEcpayOrder'])->name('createEcpayOrder');
 
 Route::post('/ecpay/callback', [OrdersController::class, 'ecpayCallback'])->name('ecpayCallback');
+
+
+
+
+Route::post('/store-form-data', function (Request $request) {
+    $userId = Auth::id();
+    $recipient = $request->input('recipient');
+    $contactNumber = $request->input('contact_number');
+    $shippingAddress = $request->input('shipping_address');
+
+    // 存入 session
+    Session::put([
+        'userId' => $userId,
+        'recipient' => $recipient,
+        'contact_number' => $contactNumber,
+        'shipping_address' => $shippingAddress,
+    ]);
+
+    $user=User::find($userId);
+    $userEmail=$user->email;
+
+    Mail::to($userEmail)->send((new LaravelMail($userId))->setCustomView('receipt'));
+
+
+    return redirect()->route('createEcpayOrder');
+})->name('storeFormData');
+
+Route::get('/orderList/{id}', function ($id) {
+    $paidDatas = Paid::where('user_id', $id)->get();
+    ItemController::getTotalQuantity();
+    
+    //dd($paidDatas);
+    // 將資料傳遞給視圖或進行其他操作
+    return view('orderList', ['paidDatas' => $paidDatas]);
+})->name('orderList');
+
+
+Route::get('/totalOrder', function () {
+    $paidDatas = Paid::all();
+
+    //dd($paidDatas);
+    // 將資料傳遞給視圖或進行其他操作
+    return view('totalOrder', ['paidDatas' => $paidDatas]);
+})->name('totalOrder');

@@ -59,7 +59,6 @@ class ItemController extends Controller
 
     // 儲存 totalQuantity 到 session
     session(['cartQuantity' => $totalQuantity]);
-
     return $totalQuantity;
 }
 
