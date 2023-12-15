@@ -22,5 +22,8 @@ class Paid extends Model
         'ItemName',
         'ItemPrice',
         'ItemQuantity',
+        'invoiceNo', // 新增欄位
+        'invoiceDate', // 新增欄位
+        'randomNumber', // 新增欄位
     ];
 }

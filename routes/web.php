@@ -251,12 +251,6 @@ Route::post('/store-form-data', function (Request $request) {
         'shipping_address' => $shippingAddress,
     ]);
 
-    $user=User::find($userId);
-    $userEmail=$user->email;
-
-    Mail::to($userEmail)->send((new LaravelMail($userId))->setCustomView('receipt'));
-
-
     return redirect()->route('createEcpayOrder');
 })->name('storeFormData');
 

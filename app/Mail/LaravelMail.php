@@ -39,6 +39,7 @@ class LaravelMail extends Mailable
     public function content(): Content
     {
         $view = $this->customView ? $this->customView : 'email';
+        \Log::info('View Name: ' . $view);
 
         return new Content(
             view: $view,

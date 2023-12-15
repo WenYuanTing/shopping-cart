@@ -25,7 +25,9 @@ return new class extends Migration
             $table->string('ItemName');
             $table->integer('ItemPrice');
             $table->integer('ItemQuantity');
-            
+            $table->string('invoiceNo'); // 新增欄位
+            $table->timestamp('invoiceDate')->nullable(); // 新增欄位
+            $table->string('randomNumber'); // 新增欄位
             $table->timestamps();
         });
     }

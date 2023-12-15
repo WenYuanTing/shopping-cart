@@ -3,13 +3,15 @@
 namespace App\Http\Controllers;
 use App\Models\Paid;
 use App\Models\UserPaid;
-
+use App\Models\User;
 use App\Models\UsersShoppingCart; 
 use Illuminate\Http\Request;
 use Ecpay\Sdk\Factories\Factory;
 use Ecpay\Sdk\Services\UrlService;
 use Ecpay\Sdk\Response\VerifiedArrayResponse;
 use Ecpay\Sdk\Services\CheckMacValueService;
+use App\Mail\LaravelMail;
+use Illuminate\Support\Facades\Mail;
 
 class OrdersController extends Controller
 {
@@ -67,6 +69,71 @@ class OrdersController extends Controller
         $shoppingCartItems = UsersShoppingCart::where('user_id', $ecpayData['CustomField4'])
         ->select('name', 'price', 'quantity')
         ->get();
+
+\Log::info('shoppingCartItems:', $shoppingCartItems->toArray());
+
+        
+        if($ecpayData['RtnCode']==1){
+            \Log::info('交易成功!!!');
+        //-----------------------發票-------------------------
+        $factory = new Factory([
+            'hashKey' => 'ejCk326UnaZWKisg',
+            'hashIv' => 'q9jcZX8Ib9LM8wYk',
+        ]);
+        $postService = $factory->create('PostWithAesJsonResponseService');
+
+        $itemCount = 1;
+        $itemAmount = $request->TradeAmt;
+        $saleAmount = $request->TradeAmt;
+        $data = [
+            'MerchantID' => '2000132',
+            'RelateNumber' => 'Test' . time(),
+            'CustomerPhone' => $ecpayData['CustomField2'],
+            'Print' => '0',
+            'Donation' => '0',
+            'CarrierType' => '1',
+            'TaxType' => '1',
+            'SalesAmount' => $saleAmount,
+            'Items' => [
+                [
+                    'ItemName' => 'WenYT電商-服裝首飾',
+                    'ItemCount' => $itemCount,
+                    'ItemWord' => '個',
+                    'ItemPrice' => $request->TradeAmt ,
+                    'ItemTaxType' => '1',
+                    'ItemAmount' => $itemAmount,
+                ],
+                
+            ],
+            'InvType' => '07'
+        ];
+        \Log::info('ECPay Data:', $data);
+
+        $input = [
+            'MerchantID' => '2000132',
+            'RqHeader' => [
+                'Timestamp' => time(),
+                'Revision' => '3.0.0',
+            ],
+            'Data' => $data,
+        ];
+        $url = 'https://einvoice-stage.ecpay.com.tw/B2CInvoice/Issue';
+
+        $response = $postService->post($input, $url);
+
+        \Log::info('開立發票結果為: ', $response);
+
+        $invoiceNo = $response['Data']['InvoiceNo'] ?? null;
+        $invoiceDate = $response['Data']['InvoiceDate'] ?? null;
+        $randomNumber = $response['Data']['RandomNumber'] ?? null;
+
+        \Log::info('InvoiceNo: ' . $invoiceNo);
+        \Log::info('InvoiceDate: ' . $invoiceDate);
+        \Log::info('RandomNumber: ' . $randomNumber);
+        //-----------------------發票-------------------------
+
+        }
+
         $commonFields = [
             'user_id' => $ecpayData['CustomField4'],
             'MerchantTradeNo' => $ecpayData['MerchantTradeNo'],
@@ -77,8 +144,12 @@ class OrdersController extends Controller
             'Recipient' => $ecpayData['CustomField1'],
             'ContactNumber' => $ecpayData['CustomField2'],
             'ShippingAddress' => $ecpayData['CustomField3'],
+            'invoiceNo'=>$invoiceNo,
+            'invoiceDate'=>$invoiceDate,
+            'randomNumber'=>$randomNumber,
         ];
-        
+        \Log::info('$commonFields', $commonFields);
+
         // 創建 Paid 實例並將每筆資料新增進去
         foreach ($shoppingCartItems as $item) {
             Paid::create(array_merge(
@@ -96,9 +167,21 @@ class OrdersController extends Controller
 
         \Log::info('shoppingCartItems', $shoppingCartItems->toArray());
 
+        $user=User::find($ecpayData['CustomField4']);
+        $userEmail=$user->email;
+        $mail = new LaravelMail($commonFields);
+
+// 发送邮件
+Mail::to($userEmail)->send($mail->setCustomView('receipt')->with('commonFields', $commonFields));
+
+       
+
+
         return response('1|OK');
     }
 }
+
+
 
 // ECPay Callback Request: {
 //     "MerchantTradeNo":"WenYT1702600942",
@@ -109,4 +192,27 @@ class OrdersController extends Controller
 //     "TradeNo":"2312150842252399",
     //user_id
     //
+// } 
+
+
+// [2023-12-15 09:09:28] local.INFO: 開立發票結果為:  
+// {"Data":
+//     {
+//         "RtnCode":1,
+//         "RtnMsg":"開立發票成功",
+//         "InvoiceNo":"KH22054554",
+//         "InvoiceDate":"2023-12-15 17:09:28",
+//         "RandomNumber":"8702"
+//     },
+//     "MerchantID":2000132,
+//     "PlatformID":0,
+//     "RpHeader":
+//     {
+//         "Timestamp":1702631370,
+//         "RqID":"fec5bbe9-2515-48c5-820f-16ebd4aebf07",
+//         "Revision":"3.0.0"
+//     },
+//     "TransCode":1,
+//     "TransMsg":
+//     "Success"
 // } 
