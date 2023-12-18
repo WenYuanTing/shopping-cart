@@ -18,40 +18,41 @@
     </div>
     <div class="flex flex-wrap">
         <?php
-// Blade 模板中的 PHP 代碼
-$orderGroups = $paidDatas->groupBy('MerchantTradeNo');
-?>
+        $orderGroups = $paidDatas->groupBy('MerchantTradeNo');
+        ?>
 
         @foreach($orderGroups as $orderNo => $orderItems)
-            <div class=" m-10 p-3 border-solid border-2 border-black ">
+            @if($orderGroups->isEmpty())
+                <div>暫無訂單</div>
+            @else
+                <div class=" m-10 p-3 border-solid border-2 border-black ">
 
-                <!-- 在這裡放入您的程式碼 -->
-                <h2>訂單編號 : {{ $orderNo }}</h2>
-                <p>---------------------------------</p>
+                    <!-- 在這裡放入您的程式碼 -->
+                    <h2>訂單編號 : {{ $orderNo }}</h2>
+                    <p>---------------------------------</p>
 
-                <p class="mb-4">訂單商品 : </p>
+                    <p class="mb-4">訂單商品 : </p>
 
-                @foreach($orderItems as $paidData)
-                    <!-- 每筆資料都顯示的數據 -->
-                    <p> {{ $paidData->ItemName }} x {{ $paidData->ItemQuantity }} </p>
-                @endforeach
+                    @foreach($orderItems as $paidData)
+                        <!-- 每筆資料都顯示的數據 -->
+                        <p> {{ $paidData->ItemName }} x {{ $paidData->ItemQuantity }} </p>
+                    @endforeach
 
-                <!-- 總價格、交易狀況等其他訂單相關資訊 -->
-                <p class="mt-2">總價格 : {{ $orderItems->first()->TradeAmt }}</p>
-                <p>---------------------------------</p>
-                <p>交易狀況 : {{ $orderItems->first()->RtnMsg }} </p>
-                <p>付款日期 : {{ $orderItems->first()->PaymentDate }}</p>
-                <p>收件人 : {{ $orderItems->first()->Recipient }}</p>
-                <p>收件地址 : {{ $orderItems->first()->ShippingAddress }}</p>
-                <p>聯絡電話 : {{ $orderItems->first()->ContactNumber }}</p>
-            </div>
+                    <!-- 總價格、交易狀況等其他訂單相關資訊 -->
+                    <p class="mt-2">總價格 : {{ $orderItems->first()->TradeAmt }}</p>
+                    <p>---------------------------------</p>
+                    <p>交易狀況 : {{ $orderItems->first()->RtnMsg }} </p>
+                    <p>付款日期 : {{ $orderItems->first()->PaymentDate }}</p>
+                    <p>收件人 : {{ $orderItems->first()->Recipient }}</p>
+                    <p>收件地址 : {{ $orderItems->first()->ShippingAddress }}</p>
+                    <p>聯絡電話 : {{ $orderItems->first()->ContactNumber }}</p>
+                </div>
+
+
+
+            @endif
 
         @endforeach
-
-        @if($orderGroups->isEmpty())
-            <div>暫無訂單</div>
-        @endif
-
 
 
 

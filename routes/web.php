@@ -119,8 +119,6 @@ Route::put('/items/{id}',function($id, Request $request){
 })->name('items.update');
 
 
-
-
 Route::post('/items/{itemId}/activate', function ($itemId) {
     // 根據 $itemId 從資料庫中找到對應的商品
     $item = Item::find($itemId);
@@ -134,16 +132,6 @@ Route::post('/items/{itemId}/activate', function ($itemId) {
     // 回傳成功訊息或其他需要的資料
     return redirect()->route('items.index');
 });
-
-
-Route::get('/login', function () {
-    return Inertia::render('dashboard', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-})->name('login');
 
 Route::get('/dashboard', function () {
     return redirect()->route('items.index');
@@ -274,19 +262,6 @@ Route::get('/totalOrder', function () {
 
 
 Route::post('/receiptSearch', function (Request $request) {
-    // 假設您有一些要保存的數據
-    $dataToPass = [
-        'invoiceNumber' => $request->input('invoiceNumber'),
-        'invoiceDate' => $request->input('invoiceDate'),
-    ];
-    //dd($dataToPass);
-    $request->session()->put('receiptSearchData', $dataToPass);
 
-    // 進行重定向
     return app(OrdersController::class)->handleReceiptSearch($request);
 })->name('receiptSearch');
-
-// Route::get('/receiptSearch', function (Request $request) {
-//     //dd("進入到GET receiptSearch");
-//     return redirect()->route('handleReceiptSearch');
-// })->name('handlereceiptSearch');

@@ -28,8 +28,6 @@
                         @if(auth()->user()->name!="溫沅庭")
                             <a href="{{ route('itemAddToCart', $item->id) }}">[
                                 加入購物車 ]</a>
-
-
                         @endif
 
                     @else

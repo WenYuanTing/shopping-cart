@@ -31,10 +31,7 @@
                         <button onclick="activateItem({{ $item->id }})">上架商品</button>
                     @endif
                 </form>
-
             </div>
-
-
         @empty
             <div>暫無商品</div>
         @endforelse

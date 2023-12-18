@@ -30,8 +30,6 @@
                     <button class="text-white" type="submit">查詢發票</button>
                 </form>
             @endif
-        @endauth
-        @auth
             <a class="text-white" href="#"
                 onclick="event.preventDefault(); document.getElementById('logout-form').submit();">登出</a>
         @else

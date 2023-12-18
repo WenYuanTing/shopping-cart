@@ -44,7 +44,7 @@ class OrdersController extends Controller
             'CustomField2' =>$contactNumber,
             'CustomField3' =>$shippingAddress,
             'CustomField4' =>$userId,
-            'ReturnURL' => 'https://d887-123-192-82-233.ngrok-free.app/ecpay/callback',
+            'ReturnURL' => 'https://7465-123-192-82-233.ngrok-free.app/ecpay/callback',
             'ClientBackURL' => route('orderList', ['id' => $userId]), // 返回商家網站按鈕
 
         ];
@@ -66,15 +66,13 @@ class OrdersController extends Controller
         $ecpayData = $request->all();
         \Log::info('ECPay Callback Request:', $ecpayData);
 
-        $shoppingCartItems = UsersShoppingCart::where('user_id', $ecpayData['CustomField4'])
-        ->select('name', 'price', 'quantity')
-        ->get();
-
-\Log::info('shoppingCartItems:', $shoppingCartItems->toArray());
-
-        
         if($ecpayData['RtnCode']==1){
-            \Log::info('交易成功!!!');
+            $shoppingCartItems = UsersShoppingCart::where('user_id', $ecpayData['CustomField4'])
+            ->select('name', 'price', 'quantity')
+            ->get();
+    
+        \Log::info('shoppingCartItems:', $shoppingCartItems->toArray());
+        \Log::info('交易成功!!!');
         //-----------------------發票-------------------------
         $factory = new Factory([
             'hashKey' => 'ejCk326UnaZWKisg',
@@ -132,8 +130,6 @@ class OrdersController extends Controller
         \Log::info('RandomNumber: ' . $randomNumber);
         //-----------------------發票-------------------------
 
-        }
-
         $commonFields = [
             'user_id' => $ecpayData['CustomField4'],
             'MerchantTradeNo' => $ecpayData['MerchantTradeNo'],
@@ -163,10 +159,6 @@ class OrdersController extends Controller
             ));
         }
         UsersShoppingCart::where('user_id', $ecpayData['CustomField4'])->delete();
-
-
-        \Log::info('shoppingCartItems', $shoppingCartItems->toArray());
-
         $user=User::find($ecpayData['CustomField4']);
         $userEmail=$user->email;
         $mail = new LaravelMail($commonFields);
@@ -178,15 +170,10 @@ Mail::to($userEmail)->send($mail->setCustomView('receipt')->with('commonFields',
 
 
         return response('1|OK');
+        }
+
     }
     public function handleReceiptSearch(Request $request){
-        $dataToPass = [
-            'invoiceNumber' => $request->input('invoiceNumber'),
-            'invoiceDate' => $request->input('invoiceDate'),
-        ];
-        //dd($dataToPass);
-
-
         $factory = new Factory([
             'hashKey' => 'ejCk326UnaZWKisg',
             'hashIv' => 'q9jcZX8Ib9LM8wYk',

@@ -36,7 +36,6 @@ class RegisteredUserController extends Controller
             'email' => 'required|string|lowercase|email|max:255|unique:'.User::class,
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'is_admin' => ['nullable', 'boolean'], // Add this line for the new checkbox
-
         ]);
 
         $user = User::create([
